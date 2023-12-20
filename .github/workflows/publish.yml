@@ -6,27 +6,30 @@ on:
             - v*
 jobs:
     build:
-        runs-on: node:18
+        env:
+            FACTORIO_API_KEY: ${{ secrets.FACTORIO_API_KEY }}
+        runs-on: ubuntu-latest
         steps:
             -   name: Checkout
                 uses: actions/checkout@v2
+            -   name: Install Node.js
+                uses: actions/setup-node@v2
+                with:
+                    node-version: 18
             -   name: Compile to lua
                 run: |
                     npm install
                     npm run build-lua
-    publish:
-        runs-on: mcr.microsoft.com/dotnet/sdk:8.0
-        needs:
-            - build
-        env:
-            FACTORIO_API_KEY: ${{ secrets.FACTORIO_API_KEY }}
-        steps:
-            - name: Install dependencies
-              run: |
-                  apt-get update
-                  apt-get install -y --no-install-recommends \
-                      jq \
-                      zip
+            -   name: Install dotnet sdk
+                uses: actions/setup-dotnet@v1
+                with:
+                    dotnet-version: 8.0.x
+            -   name: Install publish dependencies
+                run: |
+                    apt-get update
+                    apt-get install -y --no-install-recommends \
+                        jq \
+                        zip
             -   name: Install Ekranos.Factorio.Api.Cli
                 run: dotnet tool install --global Ekranos.Factorio.Api.Cli
             -   name: Publish to mod portal
