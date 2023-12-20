@@ -5,7 +5,7 @@ on:
         tags:
             - v*
 jobs:
-    build:
+    publish:
         env:
             FACTORIO_API_KEY: ${{ secrets.FACTORIO_API_KEY }}
         runs-on: ubuntu-latest
@@ -18,17 +18,14 @@ jobs:
                 uses: actions/setup-node@v4
                 with:
                     node-version: 18
+            -   name: Install Ekranos.Factorio.Api.Cli
+                run: dotnet tool install --global Ekranos.Factorio.Api.Cli
             -   name: Checkout
                 uses: actions/checkout@v4
             -   name: Compile to lua
                 run: |
                     npm install
                     npm run build-lua
-            -   name: Install Ekranos.Factorio.Api.Cli
-                run: dotnet tool install --global Ekranos.Factorio.Api.Cli
-            -   uses: ncipollo/release-action@v1
-                with:
-                    artifacts: "*.zip"
             -   name: Publish to mod portal
                 run: |
                     chmod +x ./publish.sh
