@@ -1,5 +1,5 @@
-name: GitHub Actions Demo
-run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+name: Publish to mod portal
+run-name: Publish version ${{ github.ref_name }}
 on:
     push:
         branches:
