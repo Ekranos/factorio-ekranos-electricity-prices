@@ -32,6 +32,9 @@ jobs:
                         zip
             -   name: Install Ekranos.Factorio.Api.Cli
                 run: dotnet tool install --global Ekranos.Factorio.Api.Cli
+            -   uses: ncipollo/release-action@v1
+                with:
+                    artifacts: "*.zip"
             -   name: Publish to mod portal
                 run: |
                     chmod +x ./publish.sh
