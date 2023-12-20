@@ -26,8 +26,8 @@ jobs:
                     dotnet-version: 8.0.x
             -   name: Install publish dependencies
                 run: |
-                    apt-get update
-                    apt-get install -y --no-install-recommends \
+                    sudo apt-get update
+                    sudo apt-get install -y --no-install-recommends \
                         jq \
                         zip
             -   name: Install Ekranos.Factorio.Api.Cli
