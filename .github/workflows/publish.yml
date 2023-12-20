@@ -11,25 +11,19 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             -   name: Install dotnet sdk
-                uses: actions/setup-dotnet@v1
+                uses: actions/setup-dotnet@v3
                 with:
                     dotnet-version: 8.0.x
             -   name: Install Node.js
-                uses: actions/setup-node@v2
+                uses: actions/setup-node@v4
                 with:
                     node-version: 18
             -   name: Checkout
-                uses: actions/checkout@v2
+                uses: actions/checkout@v4
             -   name: Compile to lua
                 run: |
                     npm install
                     npm run build-lua
-            -   name: Install publish dependencies
-                run: |
-                    sudo apt-get update
-                    sudo apt-get install -y --no-install-recommends \
-                        jq \
-                        zip
             -   name: Install Ekranos.Factorio.Api.Cli
                 run: dotnet tool install --global Ekranos.Factorio.Api.Cli
             -   uses: ncipollo/release-action@v1
