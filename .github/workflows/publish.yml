@@ -1,0 +1,35 @@
+name: GitHub Actions Demo
+run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+on:
+    push:
+        branches:
+            - master
+        tags:
+            - v*
+jobs:
+    build:
+        runs-on: node:18
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v2
+            -   name: Compile to lua
+                run: |
+                    npm install
+                    npm run build-lua
+    publish:
+        runs-on: mcr.microsoft.com/dotnet/sdk:8.0
+        env:
+            FACTORIO_API_KEY: ${{ secrets.FACTORIO_API_KEY }}
+        steps:
+            - name: Install dependencies
+              run: |
+                  apt-get update
+                  apt-get install -y --no-install-recommends \
+                      jq \
+                      zip
+            -   name: Install Ekranos.Factorio.Api.Cli
+                run: dotnet tool install --global Ekranos.Factorio.Api.Cli
+            -   name: Publish to mod portal
+                run: |
+                    chmod +x ./publish.sh
+                    ./publish.sh
