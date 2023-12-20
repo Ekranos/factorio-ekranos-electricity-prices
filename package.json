@@ -1,0 +1,29 @@
+{
+	"name": "factorio-typescript-template",
+	"version": "1.0.0",
+	"description": "",
+	"scripts": {
+		"postinstall": "node scripts/install.js",
+		"link": "node scripts/install.js",
+		"version": "node scripts/version.js -t",
+		"dev": "run-p dev:*",
+		"dev:mod": "tstl --project src\\tsconfig.json --watch",
+		"dev:scripts": "tsc --watch"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"@types/fs-extra": "^9.0.6",
+		"@types/node": "^14.14.22",
+		"factorio-types": "0.0.3",
+		"fs-extra": "^9.1.0",
+		"npm-run-all": "^4.1.5",
+		"typescript": "^4.1.3",
+		"typescript-to-lua": "^1.6.1"
+	},
+	"dependencies": {
+		"factorio-types": "^0.0.1",
+		"typed-factorio": "^1.14.0"
+	}
+}

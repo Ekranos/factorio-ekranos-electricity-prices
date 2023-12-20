@@ -1,0 +1,8 @@
+/.idea
+/*.iml
+
+*.lua
+*.js
+!scripts/*.js
+
+node_modules

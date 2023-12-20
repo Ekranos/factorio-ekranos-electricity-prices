@@ -1,0 +1,23 @@
+{
+	"compilerOptions": {
+		"rootDir": ".",
+		"outDir": "../mod",
+		"target": "esnext",
+		"lib": [
+			"esnext"
+		],
+		"moduleResolution": "node",
+		"strict": true,
+		"sourceMap": false,
+		"types": [
+			"typed-factorio/runtime"
+		]
+	},
+	"tstl": {
+		"luaTarget": "JIT",
+		"sourceMapTraceback": true
+	},
+	"include": [
+		"./**/*"
+	]
+}
