@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 VERSION=$(cat mod/info.json | jq -r '.version')
 MODID=$(cat mod/info.json | jq -r '.name')
 
