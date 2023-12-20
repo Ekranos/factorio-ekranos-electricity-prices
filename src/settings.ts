@@ -8,12 +8,6 @@ const settings: SettingDefinition[] = [
 		name: "ekranos:eep:custom-currency",
 		setting_type: "runtime-per-user",
 		default_value: "€"
-	},
-	{
-		type: "double-setting",
-		name: "ekranos:eep:custom-price",
-		setting_type: "runtime-per-user",
-		default_value: 0
 	}
 ];
 
