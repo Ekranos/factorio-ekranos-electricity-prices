@@ -20,8 +20,6 @@ jobs:
                     node-version: 18
             -   name: Install Ekranos.Factorio.Api.Cli
                 run: dotnet tool install --global Ekranos.Factorio.Api.Cli
-            -   name: Checkout
-                uses: actions/checkout@v4
             -   name: Compile to lua
                 run: |
                     npm install
