@@ -1,8 +1,12 @@
 #!/bin/bash
 
+set -e
+
 VERSION=$(cat mod/info.json | jq -r '.version')
 MODID=$(cat mod/info.json | jq -r '.name')
-DIRNAME="$MODID\_$VERSION"
+
+# DIRNAME is MODID + _ + VERSION
+DIRNAME="$MODID"_"$VERSION"
 ZIPPATH="$DIRNAME.zip"
 
 cp -r "mod" "$DIRNAME"

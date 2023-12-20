@@ -6,9 +6,9 @@
 		"link": "node scripts/install.js",
 		"version": "node scripts/version.js -t",
 		"dev": "run-p dev:*",
-		"dev:mod": "tstl --project src\\tsconfig.json --watch",
+		"dev:mod": "tstl --project src/tsconfig.json --watch",
 		"dev:scripts": "tsc --watch",
-		"build-lua": "tstl --project src\\tsconfig.json"
+		"build-lua": "tstl --project src/tsconfig.json"
 	},
 	"keywords": [],
 	"author": "",
