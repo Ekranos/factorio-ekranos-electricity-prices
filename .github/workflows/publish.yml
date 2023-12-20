@@ -18,6 +18,8 @@ jobs:
                     npm run build-lua
     publish:
         runs-on: mcr.microsoft.com/dotnet/sdk:8.0
+        needs:
+            - build
         env:
             FACTORIO_API_KEY: ${{ secrets.FACTORIO_API_KEY }}
         steps:
