@@ -1,13 +1,14 @@
 import {Countries, CountryData, CustomCountryName} from "../countries";
 import {ElectricityData, getElectricityData, Timescale, Timescales} from "../electricity-data";
-import {EventHandlerResult, subscribeEvent} from "../../utils/events";
+import {EventHandlerResult} from "../../utils/events";
 import {toWattageString} from "../conversions";
 import {formatForDisplay} from "../util";
 import {MainWindow} from "./mainwindow";
 import Button from "../../utils/gui/elements/Button";
 import Dropdown from "../../utils/gui/elements/Dropdown";
-import {stylePricesTable, styleTopBar} from "./shared";
+import {createPriceField, createTopBar, stylePricesTable} from "./shared";
 import {getPlayerSetting} from "../../utils/settingsData";
+import TextField from "../../utils/gui/elements/TextField";
 
 type State = {
 	players: Record<number, PlayerState>;
@@ -49,7 +50,7 @@ class PriceRow {
 export class ElectricityTab {
 	public static readonly TabName: string = "ekranos-electricity-prices.main-window.tabs.electricity-tab";
 
-	private readonly priceField: TextFieldGuiElement;
+	private readonly priceField: TextField;
 	private readonly currencyLabel: LabelGuiElement;
 	private readonly priceRows: PriceRow[] = [];
 	private readonly state: State;
@@ -67,24 +68,18 @@ export class ElectricityTab {
 		Countries[CustomCountryName].price = this.getPlayerState().customPrice;
 		Countries[CustomCountryName].currency = getPlayerSetting(player, "ekranos:eep:custom-currency") as string;
 
-		// Create the top
-		const top = this.frame.add({type: "flow", name: "top", direction: "horizontal"});
-		styleTopBar(top);
-		this.countryDropdown = new Dropdown(top, {
+		const {topLeft, topRight} = createTopBar(frame);
+
+		this.countryDropdown = new Dropdown(topLeft, {
 			name: "country",
 			items: Object.keys(Countries)
 		});
 		this.countryDropdown.onSelectionStateChanged(ev => this.selectCountry(ev.selectedValue))
 
-		this.priceField = top.add({
-			type: "textfield",
-			numeric: true,
-			allow_decimal: true,
-			allow_negative: false,
-			name: "custom-price"
-		});
-		this.currencyLabel = top.add({type: "label", name: "currency"});
-		const refreshButton = new Button(top, {name: "refresh", caption: "Refresh data"});
+		this.priceField = createPriceField(topRight);
+		this.priceField.onTextChanged(ev => this.onCustomPriceChanged(ev));
+		this.currencyLabel = topRight.add({type: "label", name: "currency"});
+		const refreshButton = new Button(topRight, {name: "refresh", caption: "Refresh data"});
 		refreshButton.onClick(() => this.updateElectricityData());
 
 		// Create the content area
@@ -112,8 +107,6 @@ export class ElectricityTab {
 			[timescaleLabel, wattsLabel, priceLabel].forEach(label => label.style.horizontally_stretchable = true);
 			this.priceRows.push(new PriceRow(timescale, timescaleLabel, wattsLabel, priceLabel));
 		}
-
-		subscribeEvent(defines.events.on_gui_text_changed, ev => this.onCustomPriceChanged(ev), window.eventPredicates);
 
 		// Initialize the UI state
 		this.selectCountry(this.selectedCountry.name);

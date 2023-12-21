@@ -25,7 +25,10 @@ export default class TabPane {
 		const isPlayer = (ev: OnGuiSelectedTabChangedEvent) => ev.player_index === this.element.player_index;
 		const isButton = (ev: OnGuiSelectedTabChangedEvent) => ev.element === this.element;
 
-		subscribeEvent(defines.events.on_gui_selected_tab_changed, ev => handler({...ev, pane: this}), [isValid, isPlayer, isButton]);
+		subscribeEvent(defines.events.on_gui_selected_tab_changed, ev => handler({
+			...ev,
+			pane: this
+		}), [isValid, isPlayer, isButton]);
 	}
 
 	public get selectedTabIndex(): number | undefined {

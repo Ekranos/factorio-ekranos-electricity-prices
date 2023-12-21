@@ -7,8 +7,7 @@ import Dropdown from "../../utils/gui/elements/Dropdown";
 import ChooseElemButton from "../../utils/gui/elements/ChooseElemButton";
 import TextField from "../../utils/gui/elements/TextField";
 import {getPlayerSetting} from "../../utils/settingsData";
-import Checkbox from "../../utils/gui/elements/Checkbox";
-import {stylePricesTable, styleTopBar} from "./shared";
+import {createPriceField, createTopBar, stylePricesTable} from "./shared";
 
 export class PriceRow {
 	public constructor(
@@ -59,37 +58,32 @@ export class FluidTab {
 		if (state.players === undefined) state.players = {};
 		this.state = state as State;
 
-		const top = frame.add({type: "flow", direction: "horizontal"});
-		styleTopBar(top);
-		this.productionConsumptionDropdown = new Dropdown(top, {
+		const {topLeft, topRight} = createTopBar(frame);
+
+		this.productionConsumptionDropdown = new Dropdown(topLeft, {
 			items: ["Production", "Consumption"] as ProductionOrConsumption[],
 			selected_index: 1
 		});
 		this.productionConsumptionDropdown.onSelectionStateChanged(ev => this.onSelectionStateChanged(ev));
 
-		this.fluidChooser = new ChooseElemButton(top, {elem_type: "fluid", initialValue: "crude-oil"});
+		this.fluidChooser = new ChooseElemButton(topLeft, {elem_type: "fluid", initialValue: "crude-oil"});
 		this.fluidChooser.onElemChanged(ev => this.changeFluid(ev.value));
 
-		this.priceField = new TextField(top, {
-			text: this.getPlayerState().fluidPrices[this.fluid]?.toString() ?? "0",
-			numeric: true,
-			allow_negative: false,
-			allow_decimal: true
-		});
+		this.priceField = createPriceField(topRight);
 		this.priceField.onTextChanged(ev => this.onPriceFieldChanged(ev));
-		top.add({
+		topRight.add({
 			type: "label",
 			caption: `${getPlayerSetting(this.player, "ekranos:eep:custom-currency")} / ${getPlayerSetting(this.player, "ekranos:eep:liquid-uom")}`
 		});
 
-		const refreshDataButton = new Button(top, {caption: "Refresh data"});
+		const refreshDataButton = new Button(topRight, {caption: "Refresh data"});
 		refreshDataButton.onClick(() => this.update());
 
-		const autoUpdateCheckbox = new Checkbox(top, {
-			state: this.autoUpdate = this.getPlayerState().autoUpdate ?? true,
-			caption: "Auto update"
-		});
-		autoUpdateCheckbox.onChanged(ev => this.getPlayerState().autoUpdate = this.autoUpdate = ev.state);
+		// const autoUpdateCheckbox = new Checkbox(top, {
+		// 	state: this.autoUpdate = this.getPlayerState().autoUpdate ?? true,
+		// 	caption: "Auto update"
+		// });
+		// autoUpdateCheckbox.onChanged(ev => this.getPlayerState().autoUpdate = this.autoUpdate = ev.state);
 
 		const table = frame.add({type: "table", column_count: 3});
 		stylePricesTable(table);
