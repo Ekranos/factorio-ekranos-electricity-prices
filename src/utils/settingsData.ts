@@ -1,6 +1,6 @@
 import {SettingDefinition} from "typed-factorio/settings/types";
 
-export type SettingName = "ekranos:eep:custom-currency" | "ekranos:eep:units-per-litre";
+export type SettingName = "ekranos:eep:custom-currency" | "ekranos:eep:liquid-units-per-uom" | "ekranos:eep:liquid-uom";
 
 export const SettingDefinitions: (SettingDefinition & { name: SettingName })[] = [
 	{
@@ -11,10 +11,15 @@ export const SettingDefinitions: (SettingDefinition & { name: SettingName })[] =
 	},
 	{
 		type: "double-setting",
-		name: "ekranos:eep:units-per-litre",
+		name: "ekranos:eep:liquid-units-per-uom",
 		setting_type: "runtime-per-user",
 		default_value: 3,
-		minimum_value: 0.0001,
+	},
+	{
+		type: "string-setting",
+		name: "ekranos:eep:liquid-uom",
+		setting_type: "runtime-per-user",
+		default_value: "l"
 	}
 ];
 

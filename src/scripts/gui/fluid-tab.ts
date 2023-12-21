@@ -8,23 +8,23 @@ import ChooseElemButton from "../../utils/gui/elements/ChooseElemButton";
 import TextField from "../../utils/gui/elements/TextField";
 import {getPlayerSetting} from "../../utils/settingsData";
 import Checkbox from "../../utils/gui/elements/Checkbox";
-import {styleTopBar} from "./shared";
+import {stylePricesTable, styleTopBar} from "./shared";
 
 export class PriceRow {
 	public constructor(
 		public readonly timescale: Timescale,
 		private readonly timescaleLabel: LuaGuiElement,
-		private readonly litreLabel: LuaGuiElement,
+		private readonly uomLabel: LuaGuiElement,
 		private readonly priceLabel: LuaGuiElement
 	) {
 		this.timescaleLabel.caption = timescale.name;
 	}
 
-	public update(itemsPerMinute: number, price: number, currency: string) {
+	public update(itemsPerMinute: number, price: number, currency: string, uom: string) {
 		const items = itemsPerMinute * this.timescale.ticks / 60 / 60;
 		const finalPrice = items * price;
 
-		this.litreLabel.caption = `${formatForDisplay(items, 2)} L`;
+		this.uomLabel.caption = `${formatForDisplay(items, 2)} ${uom}`;
 		this.priceLabel.caption = `${formatForDisplay(finalPrice, 2)} ${currency}`;
 	}
 }
@@ -77,6 +77,10 @@ export class FluidTab {
 			allow_decimal: true
 		});
 		this.priceField.onTextChanged(ev => this.onPriceFieldChanged(ev));
+		top.add({
+			type: "label",
+			caption: `${getPlayerSetting(this.player, "ekranos:eep:custom-currency")} / ${getPlayerSetting(this.player, "ekranos:eep:liquid-uom")}`
+		});
 
 		const refreshDataButton = new Button(top, {caption: "Refresh data"});
 		refreshDataButton.onClick(() => this.update());
@@ -88,6 +92,7 @@ export class FluidTab {
 		autoUpdateCheckbox.onChanged(ev => this.getPlayerState().autoUpdate = this.autoUpdate = ev.state);
 
 		const table = frame.add({type: "table", column_count: 3});
+		stylePricesTable(table);
 		table.add({type: "label", caption: "Timeframe"});
 		table.add({type: "label", caption: "Amount"});
 		table.add({type: "label", caption: "Price"});
@@ -150,10 +155,12 @@ export class FluidTab {
 		const input = this.productionConsumptionDropdown.selectedValue === "Production";
 		const counts = input ? stats.input_counts : stats.output_counts;
 		const price = tonumber(this.getPlayerState().fluidPrices[this.fluid]) ?? 0;
+		const uom = getPlayerSetting(this.player, "ekranos:eep:liquid-uom") as string;
+		const currency = getPlayerSetting(this.player, "ekranos:eep:custom-currency") as string;
 
 		for (const row of this.priceRows) {
 			if (counts[this.fluid] === undefined) {
-				row.update(0, 0, "€");
+				row.update(0, 0, currency, uom);
 			}
 
 			const flow = stats.get_flow_count({
@@ -162,7 +169,7 @@ export class FluidTab {
 				precision_index: row.timescale.flowPrecisionIndex
 			});
 
-			row.update(flow, price, getPlayerSetting(this.player, "ekranos:eep:custom-currency") as string);
+			row.update(flow, price, currency, uom);
 		}
 	}
 }

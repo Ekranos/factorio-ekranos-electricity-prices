@@ -2,6 +2,7 @@ import {EventHandlerResult, reloadEventHandlers, subscribeEvent} from "../../uti
 import {PlayerEvent} from "../../utils/event_types";
 import {ElectricityTab} from "./electricity-tab";
 import {FluidTab} from "./fluid-tab";
+import TabPane, {OnGuiSelectedTabChangedEventExt} from "../../utils/gui/elements/TabPane";
 
 declare const global: {
 	mainWindow?: State;
@@ -21,7 +22,6 @@ type Tab = {
 export class MainWindow {
 	public static readonly OpenName: string = "ekranos-electricity-prices.top.open-main-window";
 	public static readonly WindowName: string = "ekranos-electricity-prices.main-window";
-	private static readonly TabsName: string = "ekranos-electricity-prices.main-window.tabs";
 
 	private static readonly Instances = new Map<number, MainWindow>();
 
@@ -45,6 +45,8 @@ export class MainWindow {
 			style: "inside_shallow_frame_with_padding",
 		});
 
+		this.frame.style.horizontally_stretchable = true;
+		this.frame.style.horizontally_squashable = true;
 		this.frame.auto_center = true;
 
 		player.opened = this.frame;
@@ -63,32 +65,26 @@ export class MainWindow {
 			}
 		]
 
-		const pane = this.frame.add({
-			type: "tabbed-pane",
-			name: MainWindow.TabsName,
-			style: "tabbed_pane_with_no_side_padding"
-		});
+		const pane = new TabPane(this.frame, {name: "my-tabs", style: "tabbed_pane_with_no_side_padding"});
 
 		for (const tab of tabs) {
-			const tabElement = pane.add({type: "tab", name: tab.name, caption: tab.caption});
-			const frame = pane.add({type: "frame", direction: "vertical"});
-			frame.style.vertically_stretchable = true;
-			frame.style.horizontally_stretchable = true;
-			pane.add_tab(tabElement, frame);
+			const {content} = pane.addTab(
+				{name: tab.name, caption: tab.caption},
+				{type: "frame", name: `tab-frame-${tab.name}`, direction: "vertical"}
+			);
+			content.style.vertically_stretchable = true;
+			content.style.horizontally_stretchable = true;
+			// frame.style.horizontally_squashable = true;
 
-			tab.factory(frame, this.getTabState(tab.name));
+			tab.factory(content, this.getTabState(tab.name));
 			this.tabs[tab.name] = tab;
 		}
 
 		// Set the selected tab
-		const selectedTab = this.getWindowState().selectedTab[player.index];
-		if (selectedTab !== undefined) {
-			const index = tabs.findIndex(tab => tab.name === selectedTab);
-			if (index !== -1) pane.selected_tab_index = tabs.findIndex(tab => tab.name === selectedTab) + 1;
-		}
+		pane.selectedTab = this.getWindowState().selectedTab[player.index];
+		pane.onTabChanged(ev => this.onGuiSelectedTabChanged(ev));
 
 		subscribeEvent(defines.events.on_gui_closed, ev => this.onGuiClosed(ev), this.eventPredicates);
-		subscribeEvent(defines.events.on_gui_selected_tab_changed, ev => this.onGuiSelectedTabChanged(ev), this.eventPredicates);
 
 		reloadEventHandlers();
 	}
@@ -107,14 +103,9 @@ export class MainWindow {
 		return windowState;
 	}
 
-	private onGuiSelectedTabChanged(ev: OnGuiSelectedTabChangedEvent) {
-		if (ev.element?.name !== MainWindow.TabsName) return;
-
-		const pane = ev.element as TabbedPaneGuiElement;
-		const selected = pane.tabs[ev.element.selected_tab_index as number - 1];
-
+	private onGuiSelectedTabChanged(ev: OnGuiSelectedTabChangedEventExt) {
 		const windowState = this.getWindowState();
-		windowState.selectedTab[this.player.index] = selected.tab.name;
+		windowState.selectedTab[this.player.index] = ev.pane.selectedTab;
 	}
 
 	private onGuiClosed(event: OnGuiClosedEvent): EventHandlerResult {

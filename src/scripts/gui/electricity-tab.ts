@@ -6,7 +6,8 @@ import {formatForDisplay} from "../util";
 import {MainWindow} from "./mainwindow";
 import Button from "../../utils/gui/elements/Button";
 import Dropdown from "../../utils/gui/elements/Dropdown";
-import {styleTopBar} from "./shared";
+import {stylePricesTable, styleTopBar} from "./shared";
+import {getPlayerSetting} from "../../utils/settingsData";
 
 type State = {
 	players: Record<number, PlayerState>;
@@ -48,10 +49,8 @@ class PriceRow {
 export class ElectricityTab {
 	public static readonly TabName: string = "ekranos-electricity-prices.main-window.tabs.electricity-tab";
 
-	private static readonly PricesTableName: string = "ekranos-electricity-prices.main-window.tabs.electricity-tab.prices-table";
-	private static readonly CustomPriceName: string = "ekranos-electricity-prices.main-window.tabs.electricity-tab.custom-price";
-
 	private readonly priceField: TextFieldGuiElement;
+	private readonly currencyLabel: LabelGuiElement;
 	private readonly priceRows: PriceRow[] = [];
 	private readonly state: State;
 	private readonly countryDropdown: Dropdown;
@@ -66,11 +65,13 @@ export class ElectricityTab {
 		this.selectedCountry = Countries[this.getPlayerState().selectedCountry];
 		// TODO: This does not belong here.
 		Countries[CustomCountryName].price = this.getPlayerState().customPrice;
+		Countries[CustomCountryName].currency = getPlayerSetting(player, "ekranos:eep:custom-currency") as string;
 
 		// Create the top
-		const top = this.frame.add({type: "flow", direction: "horizontal"});
+		const top = this.frame.add({type: "flow", name: "top", direction: "horizontal"});
 		styleTopBar(top);
 		this.countryDropdown = new Dropdown(top, {
+			name: "country",
 			items: Object.keys(Countries)
 		});
 		this.countryDropdown.onSelectionStateChanged(ev => this.selectCountry(ev.selectedValue))
@@ -80,16 +81,18 @@ export class ElectricityTab {
 			numeric: true,
 			allow_decimal: true,
 			allow_negative: false,
-			name: ElectricityTab.CustomPriceName
+			name: "custom-price"
 		});
-		const refreshButton = new Button(top, {caption: "Refresh data"});
+		this.currencyLabel = top.add({type: "label", name: "currency"});
+		const refreshButton = new Button(top, {name: "refresh", caption: "Refresh data"});
 		refreshButton.onClick(() => this.updateElectricityData());
 
 		// Create the content area
-		const content = this.frame.add({type: "flow", direction: "vertical"});
+		const content = this.frame.add({type: "flow", name: "content", direction: "vertical"});
 
 		// Create the prices table
-		const pricesTable = content.add({type: "table", name: ElectricityTab.PricesTableName, column_count: 3});
+		const pricesTable = content.add({type: "table", name: "prices", column_count: 3});
+		stylePricesTable(pricesTable);
 		pricesTable.add({type: "label", caption: "Timeframe"});
 		pricesTable.add({type: "label", caption: "Amount"});
 		pricesTable.add({type: "label", caption: "Price"});
@@ -101,9 +104,10 @@ export class ElectricityTab {
 
 		// Create the price rows
 		for (const timescale of Timescales) {
-			const timescaleLabel = pricesTable.add({type: "label"});
-			const wattsLabel = pricesTable.add({type: "label"});
-			const priceLabel = pricesTable.add({type: "label"});
+			const labelName = (name: string) => `${timescale.name}-${name}`;
+			const timescaleLabel = pricesTable.add({type: "label", name: labelName("timescale")});
+			const wattsLabel = pricesTable.add({type: "label", name: labelName("watts")});
+			const priceLabel = pricesTable.add({type: "label", name: labelName("price")});
 
 			[timescaleLabel, wattsLabel, priceLabel].forEach(label => label.style.horizontally_stretchable = true);
 			this.priceRows.push(new PriceRow(timescale, timescaleLabel, wattsLabel, priceLabel));
@@ -135,13 +139,12 @@ export class ElectricityTab {
 		this.getPlayerState().selectedCountry = name;
 		this.priceField.text = this.selectedCountry.price.toString();
 		this.countryDropdown.selectedValue = name;
+		this.currencyLabel.caption = `${this.selectedCountry.currency} / kW/h`;
 
 		this.updatePriceRows();
 	}
 
 	private onCustomPriceChanged(event: OnGuiTextChangedEvent): EventHandlerResult {
-		if (event.element?.name !== ElectricityTab.CustomPriceName) return;
-
 		const price = tonumber(event.text.replace(",", "."));
 		if (price === undefined) return;
 
