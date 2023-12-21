@@ -21,7 +21,7 @@ export class PriceRow {
 	}
 
 	public update(itemsPerMinute: number, price: number, currency: string) {
-		const items = itemsPerMinute * this.timescale.ticks / 60;
+		const items = itemsPerMinute * this.timescale.ticks / 60 / 60;
 		const finalPrice = items * price;
 
 		this.litreLabel.caption = `${formatForDisplay(items, 2)} L`;
