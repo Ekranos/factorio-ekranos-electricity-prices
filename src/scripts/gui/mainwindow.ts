@@ -45,12 +45,10 @@ export class MainWindow {
 			style: "inside_shallow_frame_with_padding",
 		});
 
-		this.frame.style.horizontally_stretchable = true;
-		this.frame.style.horizontally_squashable = true;
+		this.frame.style.width = 600;
 		this.frame.auto_center = true;
 
 		player.opened = this.frame;
-
 
 		const tabs: Tab[] = [
 			{
