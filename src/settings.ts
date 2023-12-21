@@ -1,14 +1,7 @@
-import {Data, SettingDefinition} from "typed-factorio/settings/types";
+import {Data} from "typed-factorio/settings/types";
+import {SettingDefinitions} from "./utils/settingsData";
 
 declare const data: Data;
 
-const settings: SettingDefinition[] = [
-	{
-		type: "string-setting",
-		name: "ekranos:eep:custom-currency",
-		setting_type: "runtime-per-user",
-		default_value: "€"
-	}
-];
 
-data.extend(settings);
+data.extend(SettingDefinitions);
