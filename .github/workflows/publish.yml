@@ -10,16 +10,12 @@ jobs:
             FACTORIO_API_KEY: ${{ secrets.FACTORIO_API_KEY }}
         runs-on: ubuntu-latest
         steps:
-            -   name: Install dotnet sdk
-                uses: actions/setup-dotnet@v3
-                with:
-                    dotnet-version: 8.0.x
             -   name: Install Node.js
                 uses: actions/setup-node@v4
                 with:
                     node-version: 18
-            -   name: Install Ekranos.Factorio.Api.Cli
-                run: dotnet tool install --global Ekranos.Factorio.Api.Cli
+            -   name: Install factorio-api
+                run: curl -fsSL https://artifcats.ekranos.me/bin/factorio-api/0.1.0/factorio-api > /usr/local/bin/factorio-api && chmod +x /usr/local/bin/factorio-api
             -   name: Checkout
                 uses: actions/checkout@v4
             -   name: Compile to lua
