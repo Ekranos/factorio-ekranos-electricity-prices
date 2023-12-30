@@ -1,9 +1,0 @@
-{
-    "name": "ekranos-electricity-prices",
-    "version": "0.0.15",
-    "title": "Ekranos electricity prices",
-    "author": "Ekranos",
-    "homepage": "",
-    "dependencies": [],
-    "factorio_version": "1.1"
-}

@@ -1,0 +1,1 @@
+/mnt/c/Users/Mochida Yuka/AppData/Roaming/Factorio/mods/ekranos-electricity-prices_0.0.16/

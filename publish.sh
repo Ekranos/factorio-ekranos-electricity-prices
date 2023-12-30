@@ -13,6 +13,6 @@ cp -r "mod" "$DIRNAME"
 
 zip -r "$ZIPPATH" "$DIRNAME"
 
-factorio-api publish --api-key "$FACTORIO_API_KEY" \
+factorio-api upload --api-key "$FACTORIO_API_KEY" \
                      --mod "$MODID" \
                      --file "$ZIPPATH"
